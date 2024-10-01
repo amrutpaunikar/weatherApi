@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Weather Forecast</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url(https://i.pinimg.com/originals/fe/73/42/fe7342fe7a0c31cf7aa53ca7f71301b6.gif) no-repeat center;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: blur(8px);
+            z-index: -1;
+            transform: scale(1.05);
+        }
+
+        .weather-container {
+            padding: 20px;
+        }
+
+        .weather-status img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .forecast {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .forecast-day {
+            text-align: center;
+            color: white;
+        }
+
+        .forecast-day img {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container weather-container text-white text-center">
+        <form th:action="@{/forntend}" method="post" class="col-md-6 m-auto py-4">
+    <div class="input-group mb-3">
+        <input id="city-name" name="city" type="text" class="form-control" placeholder="Enter a location for Weather ..." th:value="${city}">
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-danger">Search</button>
+        </div>
+    </div>
+</form>
+
+        <div class="weather-status">
+          <img th:src="${current != null && current.icon_num != null ? '/images/' + current.icon_num + '.png' : '/images/default.png'}" alt="Weather Icon">
+
+            <h1 th:text="${city}">City Name</h1>
+            <h3><span th:text="${current != null ? current.temperature : 'No data available'}">Temp</span>&deg;C</h3>
+            <h1 class="lead" th:text="${current != null ? current.summary : 'No summary available'}">Weather</h1>
+        </div>
+
+        <!-- 7-Day Forecast Section -->
+        <div class="forecast">
+            <div class="forecast-day" th:each="day, iterStat : ${dailyData}">
+                <h5 th:text="'Day ' + ${iterStat.index + 1}">Day X</h5>
+            <img th:src="@{'/images/' + ${day.icon} + '.png'}" alt="Forecast Icon">
+ 
+
+                <p th:text="${day.temperatureMin} + '°C'">Temperature</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const cityInput = document.getElementById("city-name");
+
+        // Event listener for form submission
+        form.addEventListener("submit", function (event) {
+            if (cityInput.value.trim() === "") {
+                event.preventDefault(); // Prevent form submission if city is empty
+                alert("Please enter a city name!");
+            }
+        });
+    });
+
+
+    function searchTemperature(city) {
+        // Update the URL and reload the page to get the new city's weather data
+        window.location.href = `/weather?city=${encodeURIComponent(city)}`;
+    }
+        </script>
+</body>
+
+</html>

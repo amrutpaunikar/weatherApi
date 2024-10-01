@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Location</title>
+    <script>
+        // This function will be called as soon as the page loads to get the user's location
+        window.onload = function () {
+            getLocation();
+        };
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                // Get the user's location
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            // Display the coordinates on the page or send them to the server
+            document.getElementById("latitude").innerText = latitude;
+            document.getElementById("longitude").innerText = longitude;
+
+            // Optionally, send the coordinates to the server using AJAX
+            sendLocationToServer(latitude, longitude);
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        function sendLocationToServer(lat, lng) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/save-location", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log("Location sent to server successfully!");
+                }
+            };
+            var data = JSON.stringify({latitude: lat, longitude: lng});
+            xhr.send(data);
+        }
+    </script>
+</head>
+<body>
+
+<h1>Get User Location</h1>
+
+<p>Your Latitude: <span id="latitude"></span></p>
+<p>Your Longitude: <span id="longitude"></span></p>
+
+</body>
+</html>
